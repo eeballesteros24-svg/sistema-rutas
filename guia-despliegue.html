@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía de Despliegue — Sistema de Rutas</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f8fafc;color:#1e293b;font-size:15px;line-height:1.6}
+.container{max-width:740px;margin:0 auto;padding:40px 20px}
+h1{font-size:26px;font-weight:700;margin-bottom:6px;color:#0f172a}
+.subtitle{color:#64748b;margin-bottom:36px;font-size:14px}
+h2{font-size:18px;font-weight:700;margin:32px 0 12px;color:#0f172a;display:flex;align-items:center;gap:8px}
+h3{font-size:14px;font-weight:700;margin:16px 0 8px;color:#334155;text-transform:uppercase;letter-spacing:0.05em}
+p{color:#475569;margin-bottom:10px;font-size:14px}
+.step{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-bottom:12px}
+.step-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;background:#3b82f6;color:#fff;border-radius:50%;font-size:13px;font-weight:700;margin-right:8px;flex-shrink:0}
+.step-title{font-size:15px;font-weight:600;color:#0f172a;display:flex;align-items:center}
+.step-body{margin-top:12px;padding-top:12px;border-top:1px solid #f1f5f9}
+code{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:5px;padding:2px 6px;font-family:'Courier New',monospace;font-size:13px;color:#0f172a}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:14px 16px;font-size:13px;overflow-x:auto;margin:10px 0;font-family:'Courier New',monospace;line-height:1.6}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:13px}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600}
+.badge-blue{background:#dbeafe;color:#1d4ed8}
+.badge-green{background:#dcfce7;color:#15803d}
+.badge-amber{background:#fef3c7;color:#92400e}
+.badge-red{background:#fee2e2;color:#b91c1c}
+.alert{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 14px;margin:10px 0;font-size:13px;color:#78350f}
+.alert.blue{background:#eff6ff;border-color:#bfdbfe;color:#1e40af}
+.alert.green{background:#f0fdf4;border-color:#bbf7d0;color:#14532d}
+.tip{font-size:13px;color:#64748b;margin-top:6px}
+ul{padding-left:18px;margin:8px 0}
+li{color:#475569;font-size:14px;margin-bottom:4px}
+.divider{height:1px;background:#e2e8f0;margin:28px 0}
+.phone-img{background:#1e293b;border-radius:16px;padding:20px;text-align:center;color:#94a3b8;font-size:13px;margin:10px 0}
+.qr-placeholder{width:120px;height:120px;background:#fff;border-radius:8px;margin:10px auto;display:flex;align-items:center;justify-content:center;font-size:11px;color:#94a3b8;text-align:center;padding:8px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{background:#f8fafc;padding:8px 10px;text-align:left;font-weight:600;color:#475569;border-bottom:1px solid #e2e8f0}
+td{padding:8px 10px;border-bottom:1px solid #f1f5f9;color:#334155}
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>🚀 Guía de Despliegue</h1>
+<p class="subtitle">Sistema de Rutas — Cómo publicar y distribuir la app a todo el personal</p>
+
+<div class="divider"></div>
+
+<!-- PARTE 1: GITHUB PAGES -->
+<h2>📦 Parte 1 — Publicar en GitHub Pages</h2>
+<p>GitHub Pages es gratuito y es exactamente lo que necesitas: convierte tu repositorio en un sitio web al que cualquier persona puede acceder con un link.</p>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Sube los archivos al repositorio</div>
+  <div class="step-body">
+    <p>Tu repositorio debe tener estos archivos en la <strong>raíz</strong> (carpeta principal):</p>
+    <pre><code>📁 tu-repositorio/
+├── index.html      ← archivo principal
+├── manifest.json
+├── sw.js
+├── icon-192.png    ← necesitas este ícono
+└── icon-512.png    ← y este</code></pre>
+    <div class="alert">⚠️ Los íconos <code>icon-192.png</code> e <code>icon-512.png</code> son necesarios para instalar la app en el celular. Puedes usar cualquier imagen PNG renombrada, o crear un ícono gratuito en <strong>favicon.io</strong></div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">2</span> Activar GitHub Pages</div>
+  <div class="step-body">
+    <p>En tu repositorio de GitHub:</p>
+    <ul>
+      <li>Haz clic en <strong>Settings</strong> (engranaje arriba a la derecha)</li>
+      <li>En el menú izquierdo busca <strong>Pages</strong></li>
+      <li>En <em>Source</em>, selecciona <strong>Deploy from a branch</strong></li>
+      <li>En <em>Branch</em>, selecciona <strong>main</strong> y carpeta <strong>/ (root)</strong></li>
+      <li>Haz clic en <strong>Save</strong></li>
+    </ul>
+    <div class="alert blue">ℹ️ Espera 1-2 minutos. GitHub te mostrará la URL de tu app, algo como:<br><br>
+    <code>https://tu-usuario.github.io/nombre-del-repo/</code></div>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title"><span class="step-num">3</span> Verificar que funciona</div>
+  <div class="step-body">
+    <p>Abre la URL en tu celular. Deberías ver la app funcionando. Si ves un error 404, espera unos minutos más y recarga.</p>
+    <div class="alert green">✅ Cada vez que actualices <code>index.html</code> y hagas commit/push, GitHub Pages lo publicará automáticamente en menos de 2 minutos.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PARTE 2: INSTALAR EN CELULAR -->
+<h2>📱 Parte 2 — Instalar como app en el celular</h2>
+<p>La app está configurada como <strong>PWA (Progressive Web App)</strong>, lo que significa que el personal puede instalarla en su celular sin necesidad de Play Store ni App Store. Se comporta exactamente como una app nativa.</p>
+
+<h3>En Android (Chrome)</h3>
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Abrir el link en Chrome</div>
+  <div class="step-body">
+    <p>El usuario abre el link de GitHub Pages en Chrome. Después de unos segundos, Chrome muestra automáticamente un banner en la parte inferior que dice <strong>"Agregar a pantalla de inicio"</strong>.</p>
+    <p>Si no aparece el banner, tocan los <strong>3 puntos ⋮</strong> arriba a la derecha → <strong>"Agregar a pantalla de inicio"</strong>.</p>
+    <div class="alert green">✅ La app aparece en la pantalla de inicio como cualquier otra app, con el ícono y nombre "Sistema de Rutas". Se abre sin la barra del navegador.</div>
+  </div>
+</div>
+
+<h3>En iPhone / iPad (Safari)</h3>
+<div class="step">
+  <div class="step-title"><span class="step-num">1</span> Abrir en Safari (obligatorio)</div>
+  <div class="step-body">
+    <p>En iOS la instalación solo funciona desde <strong>Safari</strong>, no Chrome. El usuario debe:</p>
+    <ul>
+      <li>Abrir el link en <strong>Safari</strong></li>
+      <li>Tocar el ícono de <strong>compartir</strong> (cuadrado con flecha hacia arriba)</li>
+      <li>Bajar y tocar <strong>"Agregar a pantalla de inicio"</strong></li>
+      <li>Confirmar con <strong>Agregar</strong></li>
+    </ul>
+    <div class="alert blue">ℹ️ En iOS la app funciona perfectamente pero no puede recibir notificaciones push. Para este caso de uso (solicitar rutas) no es necesario.</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PARTE 3: DISTRIBUIR AL PERSONAL -->
+<h2>📢 Parte 3 — Cómo distribuir al personal</h2>
+
+<div class="step">
+  <div class="step-title">Opción A — Compartir el link por WhatsApp</div>
+  <div class="step-body">
+    <p>La forma más simple. Copia el link de GitHub Pages y envíalo al grupo de WhatsApp del personal con estas instrucciones:</p>
+    <pre><code>Hola equipo 👋
+
+Para solicitar tu ruta de transporte, usa esta app:
+👉 https://tu-usuario.github.io/nombre-del-repo/
+
+Para instalarla en tu celular:
+📱 Android: abre el link en Chrome → toca los 3 puntos → "Agregar a pantalla de inicio"
+🍎 iPhone: abre el link en Safari → botón compartir → "Agregar a pantalla de inicio"
+
+Tu cédula es tu identificación para ingresar.</code></pre>
+  </div>
+</div>
+
+<div class="step">
+  <div class="step-title">Opción B — Generar un código QR (recomendado)</div>
+  <div class="step-body">
+    <p>Un código QR es ideal para imprimir y pegar en carteleras, neveras o el área de descanso. El personal solo lo escanea y entra directo a la app.</p>
+    <p><strong>Cómo generarlo gratis:</strong></p>
+    <ul>
+      <li>Entra a <code>qr-code-generator.com</code> o <code>qrcode-monkey.com</code></li>
+      <li>Pega tu URL de GitHub Pages</li>
+      <li>Descarga el QR en PNG o PDF</li>
+      <li>Imprímelo y pégalo donde el personal pueda escanearlo</li>
+    </ul>
+    <div class="qr-placeholder">Aquí va el código QR con tu link</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- PARTE 4: USO DE LA APP -->
+<h2>📋 Parte 4 — Guía rápida de uso</h2>
+
+<table>
+  <thead><tr><th>Pestaña</th><th>¿Quién la usa?</th><th>Para qué sirve</th></tr></thead>
+  <tbody>
+    <tr><td><span class="badge badge-blue">Solicitar</span></td><td>Todo el personal</td><td>Pedir una ruta de INGRESO o SALIDA</td></tr>
+    <tr><td><span class="badge badge-blue">Mis Rutas</span></td><td>Todo el personal</td><td>Ver y cancelar sus propias solicitudes</td></tr>
+    <tr><td><span class="badge badge-green">Mi Perfil</span></td><td>Todo el personal</td><td>Actualizar nombre y celular (admin recibe alerta)</td></tr>
+    <tr><td><span class="badge badge-red">Admin</span></td><td>Solo admin (PIN)</td><td>Ver todo, exportar Excel, gestionar personal</td></tr>
+  </tbody>
+</table>
+
+<div class="alert blue" style="margin-top:14px">
+  🔐 <strong>PIN de admin por defecto: 1234</strong><br>
+  Cámbialo en Admin → Config → Cambiar PIN antes de distribuir la app.
+</div>
+
+<div class="divider"></div>
+
+<!-- PARTE 5: IMPORTANTE -->
+<h2>⚠️ Consideración importante sobre los datos</h2>
+
+<div class="alert">
+  <strong>Los datos se guardan en el dispositivo (localStorage)</strong>. Esto significa que si el admin exporta el Excel desde su celular y otro admin lo hace desde otro celular, cada uno ve solo los datos registrados en ese dispositivo. <br><br>
+  <strong>Para este sistema funcione bien con múltiples personas:</strong> define <strong>un solo dispositivo como "servidor"</strong> (ej: el computador del administrador o un celular dedicado) y que el personal use ese dispositivo para solicitar, o bien que todas las solicitudes se vean solo en Admin al exportar el Excel desde el dispositivo del admin.<br><br>
+  Si en el futuro necesitan sincronización real entre dispositivos (que todos vean lo mismo en tiempo real), el siguiente paso sería conectar a Firebase (base de datos gratuita en la nube). Es una mejora futura sencilla de implementar.
+</div>
+
+</div>
+</body>
+</html>
