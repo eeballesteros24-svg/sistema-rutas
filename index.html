@@ -5,46 +5,136 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0f1e">
 <title>Sistema de Rutas</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0a0f1e; --surf:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b; --green:#10b981; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-  .page { display: none; padding: 20px; max-width: 480px; margin: auto; animation: fadeIn 0.3s ease; }
-  .active { display: block; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-  
-  .card { background: var(--surf); padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
-  input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #2d3748; background: #1a2235; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
-  input:focus { border-color: var(--blue); }
-  
-  .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.2s; }
-  .btn-blue { background: var(--blue); color: white; }
-  .btn-blue:active { transform: scale(0.98); opacity: 0.9; }
-  
-  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(7,11,20,0.95); backdrop-filter: blur(10px); display: flex; border-top: 1px solid #2d3748; z-index: 100; }
-  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
-  .nav-btn.active { color: var(--blue); }
-  
-  /* Sistema Admin Invisible */
-  .admin-only { display: none !important; }
-  body.modo-admin .admin-only { display: flex !important; }
-  
-  .status-bar { font-size: 12px; text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 6px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5568; }
-  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
+:root{
+  --bg:#0a0f1e;--surface:#111827;--surface2:#1a2235;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0f4ff;--muted:#64748b;--muted2:#94a3b8;
+  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);--blue-dim2:rgba(59,130,246,0.22);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);--amber-dim2:rgba(245,158,11,0.22);
+  --green:#10b981;--green-dim:rgba(16,185,129,0.12);--green-dim2:rgba(16,185,129,0.22);
+  --red:#ef4444;--radius:14px;--radius-sm:9px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+
+/* CONTROL ADMIN */
+.admin-only { display: none !important; }
+body.is-admin .admin-only { display: flex !important; }
+
+/* NAV */
+nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(10,15,30,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border2);display:flex;z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;font-weight:500;}
+.nav-btn.active{color:var(--blue)}
+.nav-btn svg{width:22px;height:22px}
+
+/* PAGES */
+.page{display:none;padding:20px 16px calc(var(--nav-h)+16px);max-width:480px;margin:0 auto}
+.page.active{display:block}
+
+/* TOPBAR & CARDS */
+.topbar{text-align:center;padding:20px 0 16px}
+.app-icon{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1d4ed8,#6366f1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 28px rgba(99,102,241,0.3)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+
+/* INPUTS */
+input[type="text"], input[type="number"], input[type="date"]{width:100%;padding:12px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;margin-top:8px}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;margin-top:10px;text-align:center}
+.btn-primary{background:var(--blue);color:#fff}
+
+.status-msg { font-size: 12px; margin-top: 8px; color: var(--muted2); }
 </style>
 </head>
 <body>
 
-<div id="p-login" class="page active">
-  <div style="text-align:center; padding: 40px 0 20px;">
-    <h1 style="margin:0; font-size: 28px; letter-spacing: -1px;">Sistema de Rutas</h1>
-    <div class="status-bar">
-      <div id="indicador" class="dot"></div>
-      <span id="msg-sync" style="color: var(--muted)">Cargando base de datos...</span>
-    </div>
+<div id="page-registrar" class="page active">
+  <div class="topbar">
+    <div class="app-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="30" color="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg></div>
+    <h1>Sistema de Rutas</h1>
+    <p id="sync-status" class="status-msg">Sincronizando con Google Sheets...</p>
   </div>
-  
+
+  <div class="card" id="box-busqueda">
+    <label style="font-size:12px; color:var(--muted2)">Documento de Identidad</label>
+    <input type="number" id="inp-cedula" placeholder="Ej: 1022..." inputmode="numeric">
+    <button class="btn btn-primary" onclick="buscarUsuario()">Verificar Usuario</button>
+  </div>
+
+  <div class="card" id="box-confirmacion" style="display:none">
+    <div id="user-info" style="margin-bottom:15px; border-left: 3px solid var(--blue); padding-left:12px"></div>
+    <label style="font-size:12px; color:var(--muted2)">Fecha del Servicio</label>
+    <input type="date" id="inp-fecha">
+    <button class="btn btn-primary" onclick="alert('Solicitud enviada correctamente')">Confirmar Ruta</button>
+    <button class="btn" style="background:transparent; color:var(--muted)" onclick="location.reload()">Cancelar</button>
+  </div>
+</div>
+
+<div id="page-admin" class="page">
+  <div class="topbar">
+    <h1>Panel Admin</h1>
+    <p>Gestión de Yuli Jiménez</p>
+  </div>
   <div class="card">
-    <label style="font-size: 14px; color: var(--muted); font-weight: 500;">Documento de Identidad</label>
-    <input type="number" id="cedulaInp" placeholder="Ingresa tu cédula
+    <p style="font-size:14px">Base de datos cargada: <span id="count-users">0</span> empleados.</p>
+    <button class="btn btn-primary" onclick="location.reload()">Refrescar Datos</button>
+  </div>
+</div>
+
+<nav>
+  <button class="nav-btn active" onclick="showPage('registrar')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+    <span>Solicitar</span>
+  </button>
+  <button class="nav-btn admin-only" id="nav-admin" onclick="showPage('admin')">
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg>
+    <span>Admin</span>
+  </button>
+</nav>
+
+<script>
+const URL_SHEET = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
+let db_personal = [];
+
+async function init() {
+  // Comprobar si el link tiene ?admin=1
+  if (new URLSearchParams(window.location.search).get('admin') === '1') {
+    document.body.classList.add('is-admin');
+  }
+
+  try {
+    const res = await fetch(URL_SHEET, { redirect: 'follow' });
+    db_personal = await res.json();
+    document.getElementById('sync-status').innerText = "● Conectado a Google Sheets";
+    document.getElementById('sync-status').style.color = "var(--green)";
+    document.getElementById('count-users').innerText = db_personal.length;
+  } catch (e) {
+    document.getElementById('sync-status').innerText = "Error al conectar. Verifica internet.";
+  }
+}
+
+function buscarUsuario() {
+  const ced = document.getElementById('inp-cedula').value;
+  const user = db_personal.find(u => String(u.cedula) === String(ced));
+  
+  if (user) {
+    document.getElementById('box-busqueda').style.display = 'none';
+    document.getElementById('box-confirmacion').style.display = 'block';
+    document.getElementById('user-info').innerHTML = `<h3 style="color:var(--blue)">${user.nombre}</h3><p style="font-size:13px; color:var(--muted2)">${user.area || 'Operativo'}</p>`;
+    document.getElementById('inp-fecha').valueAsDate = new Date();
+  } else {
+    alert("Cédula no encontrada en el sistema.");
+  }
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(pg => pg.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+window.onload = init;
+</script>
+</body>
+</html>
