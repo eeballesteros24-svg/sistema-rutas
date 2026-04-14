@@ -4,101 +4,91 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0f1e">
-<title>Sistema de Rutas - Yuli Jiménez</title>
+<title>Sistema de Rutas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0a0f1e; --surface:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b;
-  }
+  :root { --bg:#0a0f1e; --surf:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b; }
   body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
-  .page { display: none; padding: 20px; max-width: 500px; margin: auto; }
+  .page { display: none; padding: 20px; max-width: 480px; margin: auto; }
   .active { display: block; }
-  .card { background: var(--surface); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-  input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #1a2235; color: white; box-sizing: border-box; }
-  .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-  .btn-primary { background: var(--blue); color: white; }
-  
-  /* BARRA DE NAVEGACIÓN */
-  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #070b14; display: flex; border-top: 1px solid #333; }
-  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; }
+  .card { background: var(--surf); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+  input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #1a2235; color: white; box-sizing: border-box; font-size: 16px; }
+  .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+  .btn-blue { background: var(--blue); color: white; }
+  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #070b14; display: flex; border-top: 1px solid #333; z-index: 100; }
+  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; }
   .nav-btn.active { color: var(--blue); }
-
-  /* ESTO ES LO QUE PIDES: OCULTAR ADMIN POR DEFECTO */
   .admin-only { display: none !important; }
-  body.modo-admin .admin-only { display: flex !important; }
+  body.is-admin .admin-only { display: flex !important; }
+  .status-dot { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 10px; }
 </style>
 </head>
-<body id="cuerpo">
+<body>
 
-<div id="p-registro" class="page active">
-  <div style="text-align:center; padding: 20px 0;">
-    <h2>Solicitud de Ruta</h2>
-    <p id="status" style="color: gray; font-size: 12px;">Conectando a Google Sheets...</p>
+<div id="p-login" class="page active">
+  <div style="text-align:center; padding: 30px 0;">
+    <h1 style="margin:0">Sistema de Rutas</h1>
+    <div id="sync-msg" class="status-dot">Conectando con la base de datos...</div>
   </div>
   <div class="card">
-    <label>Cédula del Empleado</label>
-    <input type="number" id="cedulaInput" placeholder="Ej: 1098765432">
-    <button class="btn btn-primary" onclick="validarUsuario()">Siguiente</button>
+    <label style="font-size: 14px; color: var(--muted)">Introduce tu documento</label>
+    <input type="number" id="cedulaInp" placeholder="Cédula" inputmode="numeric">
+    <button class="btn btn-blue" onclick="verificar()">Ingresar</button>
   </div>
 </div>
 
 <div id="p-admin" class="page">
-  <h2>Panel de Control</h2>
+  <h2>Panel de Administración</h2>
   <div class="card">
-    <p>Aquí verás el resumen de rutas una vez sincronices.</p>
-    <button class="btn btn-primary" onclick="alert('Exportando a Excel...')">Descargar Reporte</button>
+    <p>Opciones de gestión para Yuli Jiménez</p>
+    <button class="btn btn-blue" onclick="alert('Sincronizando...')">Refrescar Datos</button>
   </div>
 </div>
 
 <nav>
-  <button class="nav-btn active" onclick="cambiarPagina('p-registro')"><span>Solicitar</span></button>
-  <button class="nav-btn admin-only" id="btnAdmin" onclick="cambiarPagina('p-admin')"><span>Admin</span></button>
+  <button class="nav-btn active" onclick="show('p-login')"><span>Solicitar</span></button>
+  <button class="nav-btn admin-only" id="btnAdmin" onclick="show('p-admin')"><span>Panel Admin</span></button>
 </nav>
 
 <script>
-const MI_LINK_GOOGLE = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
-let baseDeDatos = [];
+const URL_GOOGLE = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
+let personal = [];
 
-// 1. CARGAR DATOS DE GOOGLE AL ABRIR
-async function cargarDatos() {
+async function init() {
+  // 1. Verificar si eres Admin por la URL (?admin=1)
+  if (new URLSearchParams(window.location.search).get('admin') === '1') {
+    document.body.classList.add('is-admin');
+  }
+
+  // 2. Cargar datos reales de Google
   try {
-    const res = await fetch(MI_LINK_GOOGLE, { redirect: 'follow' });
-    baseDeDatos = await res.json();
-    document.getElementById('status').innerText = "✅ Sistema Listo";
+    const r = await fetch(URL_GOOGLE, { redirect: 'follow' });
+    personal = await r.json();
+    document.getElementById('sync-msg').innerHTML = "● Sistema Sincronizado";
+    document.getElementById('sync-msg').style.color = "#10b981";
   } catch (e) {
-    document.getElementById('status').innerText = "❌ Error de conexión";
+    document.getElementById('sync-msg').innerHTML = "Modo Offline (Usando caché)";
   }
 }
 
-// 2. VALIDAR SI ES ADMIN POR EL LINK
-function chequearAdmin() {
-  const parametros = new URLSearchParams(window.location.search);
-  if (parametros.get('admin') === '1') {
-    document.body.classList.add('modo-admin');
-    console.log("Acceso de administrador concedido");
-  }
-}
-
-function validarUsuario() {
-  const ced = document.getElementById('cedulaInput').value;
-  const user = baseDeDatos.find(u => String(u.cedula) === String(ced));
+function verificar() {
+  const val = document.getElementById('cedulaInp').value;
+  const user = personal.find(p => String(p.cedula) === String(val));
+  
   if(user) {
-    alert("Bienvenido " + user.nombre);
-    // Aquí iría el siguiente paso del formulario
+    alert("Hola " + user.nombre + ". Accediendo al formulario...");
+    // Aquí puedes redirigir a la siguiente parte del formulario
   } else {
-    alert("Cédula no encontrada");
+    alert("La cédula no está en el sistema. Contacta a soporte.");
   }
 }
 
-function cambiarPagina(id) {
+function show(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
 }
 
-window.onload = () => {
-  cargarDatos();
-  chequearAdmin();
-};
+window.onload = init;
 </script>
 </body>
 </html>
