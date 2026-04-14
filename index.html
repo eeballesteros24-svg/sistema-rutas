@@ -7,88 +7,44 @@
 <title>Sistema de Rutas</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-  :root { --bg:#0a0f1e; --surf:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b; }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
-  .page { display: none; padding: 20px; max-width: 480px; margin: auto; }
+  :root { --bg:#0a0f1e; --surf:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b; --green:#10b981; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+  .page { display: none; padding: 20px; max-width: 480px; margin: auto; animation: fadeIn 0.3s ease; }
   .active { display: block; }
-  .card { background: var(--surf); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
-  input { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #333; background: #1a2235; color: white; box-sizing: border-box; font-size: 16px; }
-  .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 16px; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .card { background: var(--surf); padding: 22px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+  input, select { width: 100%; padding: 14px; margin: 10px 0; border-radius: 10px; border: 1px solid #2d3748; background: #1a2235; color: white; box-sizing: border-box; font-size: 16px; outline: none; }
+  input:focus { border-color: var(--blue); }
+  
+  .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.2s; }
   .btn-blue { background: var(--blue); color: white; }
-  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #070b14; display: flex; border-top: 1px solid #333; z-index: 100; }
-  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; }
+  .btn-blue:active { transform: scale(0.98); opacity: 0.9; }
+  
+  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 75px; background: rgba(7,11,20,0.95); backdrop-filter: blur(10px); display: flex; border-top: 1px solid #2d3748; z-index: 100; }
+  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
   .nav-btn.active { color: var(--blue); }
+  
+  /* Sistema Admin Invisible */
   .admin-only { display: none !important; }
-  body.is-admin .admin-only { display: flex !important; }
-  .status-dot { font-size: 12px; color: var(--muted); text-align: center; margin-bottom: 10px; }
+  body.modo-admin .admin-only { display: flex !important; }
+  
+  .status-bar { font-size: 12px; text-align: center; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 6px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #4a5568; }
+  .dot.online { background: var(--green); box-shadow: 0 0 8px var(--green); }
 </style>
 </head>
 <body>
 
 <div id="p-login" class="page active">
-  <div style="text-align:center; padding: 30px 0;">
-    <h1 style="margin:0">Sistema de Rutas</h1>
-    <div id="sync-msg" class="status-dot">Conectando con la base de datos...</div>
+  <div style="text-align:center; padding: 40px 0 20px;">
+    <h1 style="margin:0; font-size: 28px; letter-spacing: -1px;">Sistema de Rutas</h1>
+    <div class="status-bar">
+      <div id="indicador" class="dot"></div>
+      <span id="msg-sync" style="color: var(--muted)">Cargando base de datos...</span>
+    </div>
   </div>
-  <div class="card">
-    <label style="font-size: 14px; color: var(--muted)">Introduce tu documento</label>
-    <input type="number" id="cedulaInp" placeholder="Cédula" inputmode="numeric">
-    <button class="btn btn-blue" onclick="verificar()">Ingresar</button>
-  </div>
-</div>
-
-<div id="p-admin" class="page">
-  <h2>Panel de Administración</h2>
-  <div class="card">
-    <p>Opciones de gestión para Yuli Jiménez</p>
-    <button class="btn btn-blue" onclick="alert('Sincronizando...')">Refrescar Datos</button>
-  </div>
-</div>
-
-<nav>
-  <button class="nav-btn active" onclick="show('p-login')"><span>Solicitar</span></button>
-  <button class="nav-btn admin-only" id="btnAdmin" onclick="show('p-admin')"><span>Panel Admin</span></button>
-</nav>
-
-<script>
-const URL_GOOGLE = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
-let personal = [];
-
-async function init() {
-  // 1. Verificar si eres Admin por la URL (?admin=1)
-  if (new URLSearchParams(window.location.search).get('admin') === '1') {
-    document.body.classList.add('is-admin');
-  }
-
-  // 2. Cargar datos reales de Google
-  try {
-    const r = await fetch(URL_GOOGLE, { redirect: 'follow' });
-    personal = await r.json();
-    document.getElementById('sync-msg').innerHTML = "● Sistema Sincronizado";
-    document.getElementById('sync-msg').style.color = "#10b981";
-  } catch (e) {
-    document.getElementById('sync-msg').innerHTML = "Modo Offline (Usando caché)";
-  }
-}
-
-function verificar() {
-  const val = document.getElementById('cedulaInp').value;
-  const user = personal.find(p => String(p.cedula) === String(val));
   
-  if(user) {
-    alert("Hola " + user.nombre + ". Accediendo al formulario...");
-    // Aquí puedes redirigir a la siguiente parte del formulario
-  } else {
-    alert("La cédula no está en el sistema. Contacta a soporte.");
-  }
-}
-
-function show(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-window.onload = init;
-</script>
-</body>
-</html>
+  <div class="card">
+    <label style="font-size: 14px; color: var(--muted); font-weight: 500;">Documento de Identidad</label>
+    <input type="number" id="cedulaInp" placeholder="Ingresa tu cédula
