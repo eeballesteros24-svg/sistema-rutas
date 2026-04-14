@@ -1,14 +1,25 @@
 {
-  "name": "Sistema de Rutas",
+  "name": "Sistema de Rutas - Balllest10",
   "short_name": "Rutas",
-  "description": "Solicitud de rutas de transporte",
+  "description": "Gestión y solicitud de rutas de transporte",
   "start_url": "/index.html",
+  "scope": "/",
   "display": "standalone",
-  "background_color": "#0a0f1e",
-  "theme_color": "#0a0f1e",
+  "background_color": "#000000",
+  "theme_color": "#00ff88",
   "orientation": "portrait",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }
