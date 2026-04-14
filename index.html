@@ -4,194 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0a0f1e">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Sistema de Rutas</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<title>Sistema de Rutas - Yuli Jiménez</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0a0f1e;--surface:#111827;--surface2:#1a2235;
-  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
-  --text:#f0f4ff;--muted:#64748b;--muted2:#94a3b8;
-  --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);--blue-dim2:rgba(59,130,246,0.22);
-  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);--amber-dim2:rgba(245,158,11,0.22);
-  --green:#10b981;--green-dim:rgba(16,185,129,0.12);--green-dim2:rgba(16,185,129,0.22);
-  --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
-  --radius:14px;--radius-sm:9px;--nav-h:68px;
-}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5;padding-bottom:var(--nav-h)}
+  :root {
+    --bg:#0a0f1e; --surface:#111827; --blue:#3b82f6; --text:#f0f4ff; --muted:#64748b;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding-bottom: 80px; }
+  .page { display: none; padding: 20px; max-width: 500px; margin: auto; }
+  .active { display: block; }
+  .card { background: var(--surface); padding: 20px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px; }
+  input, select { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #333; background: #1a2235; color: white; box-sizing: border-box; }
+  .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+  .btn-primary { background: var(--blue); color: white; }
+  
+  /* BARRA DE NAVEGACIÓN */
+  nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: #070b14; display: flex; border-top: 1px solid #333; }
+  .nav-btn { flex: 1; background: none; border: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; }
+  .nav-btn.active { color: var(--blue); }
 
-/* NAVEGACIÓN */
-nav{position:fixed;bottom:0;left:0;right:0;height:var(--nav-h);background:rgba(10,15,30,0.96);backdrop-filter:blur(20px);border-top:1px solid var(--border2);display:flex;z-index:100}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:none;border:none;color:var(--muted);font-size:11px;font-weight:500;transition:0.2s}
-.nav-btn.active{color:var(--blue)}
-.nav-btn svg{width:22px;height:22px}
-
-/* PÁGINAS */
-.page{display:none;padding:20px 16px;max-width:480px;margin:0 auto}
-.page.active{display:block}
-
-/* DISEÑO DE CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:12px}
-.topbar{text-align:center;padding:20px 0}
-.app-icon{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#1d4ed8,#6366f1);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
-
-/* FORMULARIO */
-label{display:block;font-size:12px;color:var(--muted2);margin-bottom:6px}
-input, select{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);margin-bottom:14px;outline:none}
-.btn{width:100%;padding:14px;border:none;border-radius:var(--radius-sm);font-weight:600;cursor:pointer;transition:0.2s}
-.btn-primary{background:var(--blue);color:white}
-.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border2);margin-top:8px}
-
-/* TIPOS DE RUTA */
-.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-.type-btn{padding:16px;border:1.5px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--muted2);font-weight:600;text-align:center}
-.type-btn.active-in{background:var(--blue-dim2);border-color:var(--blue);color:var(--blue)}
-.type-btn.active-out{background:var(--amber-dim2);border-color:var(--amber);color:var(--amber)}
-
-.persona-info{display:flex;align-items:center;gap:12px;padding:12px;background:var(--blue-dim);border-radius:var(--radius-sm);margin-bottom:16px}
-.avatar{width:40px;height:40px;border-radius:50%;background:var(--blue);display:flex;align-items:center;justify-content:center;font-weight:bold}
+  /* ESTO ES LO QUE PIDES: OCULTAR ADMIN POR DEFECTO */
+  .admin-only { display: none !important; }
+  body.modo-admin .admin-only { display: flex !important; }
 </style>
 </head>
-<body>
+<body id="cuerpo">
 
-<div id="page-registrar" class="page active">
-  <div id="step-buscar">
-    <div class="topbar">
-      <div class="app-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="30" color="white"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg></div>
-      <h1>Solicitud de Ruta</h1>
-      <p id="sync-status" style="color:var(--muted); font-size:12px">Sincronizando con Google...</p>
-    </div>
-    <div class="card">
-      <label>Número de Cédula</label>
-      <input type="text" id="inp-cedula" placeholder="Ingresa tu documento" inputmode="numeric">
-      <button class="btn btn-primary" onclick="buscarPersonal()">Continuar →</button>
-    </div>
+<div id="p-registro" class="page active">
+  <div style="text-align:center; padding: 20px 0;">
+    <h2>Solicitud de Ruta</h2>
+    <p id="status" style="color: gray; font-size: 12px;">Conectando a Google Sheets...</p>
   </div>
-
-  <div id="step-form" style="display:none">
-    <div id="persona-display"></div>
-    <div class="card">
-      <label>Tipo de Servicio</label>
-      <div class="type-grid">
-        <div class="type-btn" id="t-ingreso" onclick="setTipo('INGRESO')">INGRESO</div>
-        <div class="type-btn" id="t-salida" onclick="setTipo('SALIDA')">SALIDA</div>
-      </div>
-      <label>Fecha de la Ruta</label>
-      <input type="date" id="inp-fecha">
-      <button class="btn btn-primary" onclick="confirmarRuta()">Confirmar Solicitud</button>
-      <button class="btn btn-ghost" onclick="location.reload()">Atrás</button>
-    </div>
+  <div class="card">
+    <label>Cédula del Empleado</label>
+    <input type="number" id="cedulaInput" placeholder="Ej: 1098765432">
+    <button class="btn btn-primary" onclick="validarUsuario()">Siguiente</button>
   </div>
+</div>
 
-  <div id="step-final" style="display:none; text-align:center">
-    <div class="card">
-      <div style="color:var(--green); font-size:48px; margin-bottom:10px">✓</div>
-      <h2>¡Solicitud Exitosa!</h2>
-      <p style="color:var(--muted2); margin:15px 0" id="resumen-final"></p>
-      <button class="btn btn-primary" onclick="location.reload()">Hacer otra solicitud</button>
-    </div>
+<div id="p-admin" class="page">
+  <h2>Panel de Control</h2>
+  <div class="card">
+    <p>Aquí verás el resumen de rutas una vez sincronices.</p>
+    <button class="btn btn-primary" onclick="alert('Exportando a Excel...')">Descargar Reporte</button>
   </div>
 </div>
 
 <nav>
-  <button class="nav-btn active">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-    Solicitar
-  </button>
-  <button class="nav-btn" onclick="alert('Próximamente: Historial de rutas')">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-    Mis Rutas
-  </button>
+  <button class="nav-btn active" onclick="cambiarPagina('p-registro')"><span>Solicitar</span></button>
+  <button class="nav-btn admin-only" id="btnAdmin" onclick="cambiarPagina('p-admin')"><span>Admin</span></button>
 </nav>
 
 <script>
-const URL_API = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
+const MI_LINK_GOOGLE = "https://script.google.com/macros/s/AKfycbxoXz90TwdMp-oU1sr2h8CzahsSzhR8-6ME18EBz2l26tYbSYNG_cR5kZfmiQwxNcLB/exec";
+let baseDeDatos = [];
 
-let db = { personal: [], solicitudes: [] };
-let userSel = null;
-let tipoSel = null;
-
-// CARGAR DATOS DE GOOGLE
-async function fetchDatos() {
+// 1. CARGAR DATOS DE GOOGLE AL ABRIR
+async function cargarDatos() {
   try {
-    const status = document.getElementById('sync-status');
-    const resp = await fetch(URL_API, { redirect: 'follow' });
-    const data = await resp.json();
-    if(data && data.length > 0) {
-      db.personal = data;
-      localStorage.setItem('db_rutas', JSON.stringify(db));
-      status.innerText = "● Sistema Sincronizado";
-      status.style.color = "var(--green)";
-    }
+    const res = await fetch(MI_LINK_GOOGLE, { redirect: 'follow' });
+    baseDeDatos = await res.json();
+    document.getElementById('status').innerText = "✅ Sistema Listo";
   } catch (e) {
-    console.error(e);
-    document.getElementById('sync-status').innerText = "Modo Offline (Datos locales)";
+    document.getElementById('status').innerText = "❌ Error de conexión";
   }
 }
 
-function buscarPersonal() {
-  const ced = document.getElementById('inp-cedula').value.trim();
-  const p = db.personal.find(x => String(x.cedula) === ced);
-  
-  if(p) {
-    userSel = p;
-    document.getElementById('step-buscar').style.display = 'none';
-    document.getElementById('step-form').style.display = 'block';
-    document.getElementById('persona-display').innerHTML = `
-      <div class="persona-info">
-        <div class="avatar">${p.nombre[0]}</div>
-        <div>
-          <div style="font-weight:600">${p.nombre}</div>
-          <div style="font-size:12px; color:var(--muted2)">${p.area || 'Operativo'}</div>
-        </div>
-      </div>`;
+// 2. VALIDAR SI ES ADMIN POR EL LINK
+function chequearAdmin() {
+  const parametros = new URLSearchParams(window.location.search);
+  if (parametros.get('admin') === '1') {
+    document.body.classList.add('modo-admin');
+    console.log("Acceso de administrador concedido");
+  }
+}
+
+function validarUsuario() {
+  const ced = document.getElementById('cedulaInput').value;
+  const user = baseDeDatos.find(u => String(u.cedula) === String(ced));
+  if(user) {
+    alert("Bienvenido " + user.nombre);
+    // Aquí iría el siguiente paso del formulario
   } else {
-    alert("Cédula no encontrada en la base de datos.");
+    alert("Cédula no encontrada");
   }
 }
 
-function setTipo(t) {
-  tipoSel = t;
-  document.getElementById('t-ingreso').className = t === 'INGRESO' ? 'type-btn active-in' : 'type-btn';
-  document.getElementById('t-salida').className = t === 'SALIDA' ? 'type-btn active-out' : 'type-btn';
+function cambiarPagina(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-function confirmarRuta() {
-  const fecha = document.getElementById('inp-fecha').value;
-  if(!tipoSel || !fecha) return alert("Por favor selecciona tipo y fecha");
-
-  const solicitud = {
-    ...userSel,
-    tipo: tipoSel,
-    fecha_servicio: fecha,
-    fecha_registro: new Date().toLocaleString()
-  };
-
-  // Guardar localmente
-  db.solicitudes.push(solicitud);
-  localStorage.setItem('db_rutas', JSON.stringify(db));
-
-  document.getElementById('step-form').style.display = 'none';
-  document.getElementById('step-final').style.display = 'block';
-  document.getElementById('resumen-final').innerText = `${tipoSel} - ${fecha}`;
-}
-
-// Inicializar
 window.onload = () => {
-  const local = localStorage.getItem('db_rutas');
-  if(local) db = JSON.parse(local);
-  fetchDatos();
-  
-  // Poner fecha de hoy por defecto
-  document.getElementById('inp-fecha').valueAsDate = new Date();
+  cargarDatos();
+  chequearAdmin();
 };
 </script>
-
 </body>
 </html>
